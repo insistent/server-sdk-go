@@ -56,7 +56,7 @@ type VCMsg struct {
 	Content  string      `json:"content"`
 	User     MsgUserInfo `json:"user"`
 	Extra    string      `json:"extra"`
-	Duration string      `json:"duration"`
+	Duration interface{} `json:"duration"`
 }
 
 // IMGTextMsg 消息
@@ -65,7 +65,7 @@ type IMGTextMsg struct {
 	Content  string      `json:"content"`
 	User     MsgUserInfo `json:"user"`
 	Extra    string      `json:"extra"`
-	Duration string      `json:"duration"`
+	Duration interface{} `json:"duration"`
 	URL      string      `json:"url"`
 }
 
@@ -169,6 +169,24 @@ type BroadcastRecallContent struct {
 	ConversationType int    `json:"conversationType"`
 	IsAdmin          int    `json:"isAdmin"`
 	IsDelete         int    `json:"isDelete"`
+}
+
+// ChatRoomKVNotiMessage 聊天室属性通知消息
+type ChatRoomKVNotiMessage struct {
+	Type  int    `json:"type"`
+	Key   string `json:"string"`
+	Value string `json:"string"`
+	Extra string `json:"string"`
+}
+
+// ToString ChatRoomKVNotiMessage
+func (msg *ChatRoomKVNotiMessage) ToString() (string, error) {
+	bytes, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bytes), nil
 }
 
 /**
@@ -411,7 +429,7 @@ func (rc *RongCloud) PrivateSend(senderID string, targetID []string, objectName 
 		return RCErrorNew(1002, "Paramer 'targetID' is required")
 	}
 
-	req := httplib.Post(RONGCLOUDURI + "/message/private/publish." + ReqType)
+	req := httplib.Post(rc.rongCloudURI + "/message/private/publish." + ReqType)
 	req.SetTimeout(time.Second*rc.timeout, time.Second*rc.timeout)
 	rc.fillHeader(req)
 	req.Param("fromUserId", senderID)
@@ -766,7 +784,7 @@ func (rc *RongCloud) SystemSend(senderID string, targetID []string, objectName s
 		return RCErrorNew(1002, "Paramer 'targetID' is required")
 	}
 
-	req := httplib.Post(RONGCLOUDURI + "/message/system/publish." + ReqType)
+	req := httplib.Post(rc.rongCloudURI + "/message/system/publish." + ReqType)
 	req.SetTimeout(time.Second*rc.timeout, time.Second*rc.timeout)
 	rc.fillHeader(req)
 	req.Param("fromUserId", senderID)

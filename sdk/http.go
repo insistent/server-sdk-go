@@ -37,7 +37,8 @@ func (rc *RongCloud) httpRequest(b *httplib.BeegoHTTPRequest) (body []byte, err 
 }
 
 func checkHTTPResponseCode(rep []byte) error {
-	var code CodeResult
+	code := codePool.Get().(CodeResult)
+	defer codePool.Put(code)
 	if err := json.Unmarshal(rep, &code); err != nil {
 		return err
 	}
